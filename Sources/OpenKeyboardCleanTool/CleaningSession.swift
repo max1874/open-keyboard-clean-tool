@@ -16,6 +16,7 @@ final class CleaningSession: ObservableObject {
     private let blocker = KeyboardBlocker()
     private let isAccessibilityTrusted: () -> Bool
     private let promptForAccessibility: () -> Void
+    private let terminateApplication: @MainActor () -> Void
     private var terminationObserver: NSObjectProtocol?
 
     init(
@@ -23,10 +24,14 @@ final class CleaningSession: ObservableObject {
         promptForAccessibility: @escaping () -> Void = {
             let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
             AXIsProcessTrustedWithOptions([promptKey: true] as CFDictionary)
+        },
+        terminateApplication: @escaping @MainActor () -> Void = {
+            NSApplication.shared.terminate(nil)
         }
     ) {
         self.isAccessibilityTrusted = isAccessibilityTrusted
         self.promptForAccessibility = promptForAccessibility
+        self.terminateApplication = terminateApplication
         terminationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,
             object: nil,
@@ -70,9 +75,16 @@ final class CleaningSession: ObservableObject {
         NSWorkspace.shared.open(url)
     }
 
-    func finishAndQuit() {
+    func finishCleaning(quitAfter: Bool) {
         blocker.stop()
-        NSApplication.shared.terminate(nil)
+        state = .idle
+        if quitAfter {
+            terminateApplication()
+        }
+    }
+
+    func finishAndQuit() {
+        finishCleaning(quitAfter: true)
     }
 
     private func lockKeyboard() {

@@ -22,6 +22,7 @@ OpenKeyboardCleanTool is a tiny, open-source macOS app made for one job: tempora
 - **Open only when needed.** No menu-bar item, login item, daemon, or background helper.
 - **Mouse stays active.** Finish cleaning and quit with one click.
 - **Optional instant lock.** Choose whether the keyboard locks as soon as the app opens.
+- **Your finish behavior.** Quit automatically after cleaning, or stay open for another round.
 - **Native on macOS.** SwiftUI with Liquid Glass on macOS 26 and a material fallback on earlier releases.
 - **Private by design.** No network access, analytics, telemetry, or third-party dependencies.
 

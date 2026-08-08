@@ -33,6 +33,32 @@ final class KeyboardBlockerTests: XCTestCase {
         XCTAssertEqual(session.state, .awaitingPermission)
     }
 
+    @MainActor
+    func testFinishCanUnlockWithoutQuitting() {
+        var didTerminate = false
+        let session = CleaningSession(
+            terminateApplication: { didTerminate = true }
+        )
+
+        session.finishCleaning(quitAfter: false)
+
+        XCTAssertEqual(session.state, .idle)
+        XCTAssertFalse(didTerminate)
+    }
+
+    @MainActor
+    func testFinishQuitsWhenPreferenceIsEnabled() {
+        var didTerminate = false
+        let session = CleaningSession(
+            terminateApplication: { didTerminate = true }
+        )
+
+        session.finishCleaning(quitAfter: true)
+
+        XCTAssertEqual(session.state, .idle)
+        XCTAssertTrue(didTerminate)
+    }
+
     func testKeyboardEventsAreBlocked() {
         let keyboardEvents: [CGEventType] = [
             .keyDown,

@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 
 private let windowCornerRadius: CGFloat = 28
+private let windowSize = NSSize(width: 460, height: 440)
 
 @main
 struct OpenKeyboardCleanToolApp: App {
@@ -22,10 +23,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let session = CleaningSession()
         let rootView = CleaningView()
             .environmentObject(session)
-            .frame(width: 460, height: 390)
+            .frame(width: windowSize.width, height: windowSize.height)
 
         let window = BorderlessWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 460, height: 390),
+            contentRect: NSRect(origin: .zero, size: windowSize),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false
@@ -56,6 +57,7 @@ private final class BorderlessWindow: NSWindow {
 private struct CleaningView: View {
     @EnvironmentObject private var session: CleaningSession
     @AppStorage("lockOnLaunch") private var lockOnLaunch = false
+    @AppStorage("quitAfterCleaning") private var quitAfterCleaning = true
     @State private var didHandleLaunch = false
 
     var body: some View {
@@ -118,7 +120,7 @@ private struct CleaningView: View {
 
             Spacer(minLength: 24)
 
-            autoLockSetting
+            preferences
                 .padding(.horizontal, 28)
                 .padding(.bottom, 24)
         }
@@ -163,7 +165,9 @@ private struct CleaningView: View {
                 secondaryButton("Check Again") { session.checkPermissionAgain() }
             }
         case .locked:
-            primaryButton("Finish Cleaning") { session.finishAndQuit() }
+            primaryButton("Finish Cleaning") {
+                session.finishCleaning(quitAfter: quitAfterCleaning)
+            }
         case .failed:
             VStack(spacing: 10) {
                 primaryButton("Try Again") { session.checkPermissionAgain() }
@@ -172,12 +176,36 @@ private struct CleaningView: View {
         }
     }
 
-    private var autoLockSetting: some View {
-        Toggle(isOn: $lockOnLaunch) {
+    private var preferences: some View {
+        VStack(spacing: 0) {
+            preferenceRow(
+                title: "Lock immediately on launch",
+                detail: "Start cleaning as soon as the app opens.",
+                isOn: $lockOnLaunch
+            )
+
+            Divider()
+                .padding(.leading, 16)
+
+            preferenceRow(
+                title: "Quit after cleaning",
+                detail: "Close the app when cleaning is finished.",
+                isOn: $quitAfterCleaning
+            )
+        }
+        .background(.primary.opacity(0.045), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func preferenceRow(
+        title: String,
+        detail: String,
+        isOn: Binding<Bool>
+    ) -> some View {
+        Toggle(isOn: isOn) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Lock immediately on launch")
+                Text(title)
                     .font(.subheadline.weight(.medium))
-                Text("You can change this anytime with the mouse.")
+                Text(detail)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -185,8 +213,7 @@ private struct CleaningView: View {
         .toggleStyle(.switch)
         .controlSize(.small)
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(.primary.opacity(0.045), in: RoundedRectangle(cornerRadius: 14))
+        .padding(.vertical, 11)
     }
 
     @ViewBuilder
