@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#373d49"/>
+    <stop offset=".45" stop-color="#18202d"/>
+    <stop offset="1" stop-color="#090f18"/>
+  </linearGradient>
+  <radialGradient id="bgGlow" cx=".31" cy=".17" r=".9">
+    <stop offset="0" stop-color="#596171" stop-opacity=".45"/>
+    <stop offset=".55" stop-color="#27303d" stop-opacity=".12"/>
+    <stop offset="1" stop-color="#03070d" stop-opacity=".35"/>
+  </radialGradient>
+  <linearGradient id="key" x1=".15" y1="0" x2=".85" y2="1">
+    <stop offset="0" stop-color="#d4d9e5"/>
+    <stop offset=".48" stop-color="#b9c1d1"/>
+    <stop offset="1" stop-color="#8e99ad"/>
+  </linearGradient>
+  <linearGradient id="keyEdge" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f8fbff"/>
+    <stop offset=".3" stop-color="#d8deea"/>
+    <stop offset="1" stop-color="#667286"/>
+  </linearGradient>
+  <linearGradient id="sweep" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#c4e8ff" stop-opacity=".22"/>
+    <stop offset=".48" stop-color="#f8fdff"/>
+    <stop offset=".72" stop-color="#ccecff"/>
+    <stop offset="1" stop-color="#ffffff"/>
+  </linearGradient>
+  <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+    <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#000" flood-opacity=".35"/>
+  </filter>
+  <filter id="keyShadow" x="-50%" y="-50%" width="200%" height="200%">
+    <feDropShadow dx="0" dy="9" stdDeviation="6" flood-color="#02060c" flood-opacity=".58"/>
+    <feDropShadow dx="0" dy="-1" stdDeviation="1" flood-color="#ffffff" flood-opacity=".25"/>
+  </filter>
+  <filter id="glow" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="13" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="starGlow" x="-200%" y="-200%" width="500%" height="500%">
+    <feGaussianBlur stdDeviation="9" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <clipPath id="iconClip">
+    <rect x="54" y="54" width="916" height="916" rx="218"/>
+  </clipPath>
+</defs>
+
+<!-- transparent outside the macOS squircle -->
+<g filter="url(#shadow)">
+  <rect x="54" y="54" width="916" height="916" rx="218" fill="url(#bg)"/>
+</g>
+<g clip-path="url(#iconClip)">
+  <rect x="54" y="54" width="916" height="916" rx="218" fill="url(#bgGlow)"/>
+  <ellipse cx="290" cy="170" rx="370" ry="250" fill="#fff" opacity=".035"/>
+
+  <!-- keyboard -->
+  <g filter="url(#keyShadow)" stroke="url(#keyEdge)" stroke-width="2.2">
+    <!-- top row -->
+    <rect x="210" y="356" width="136" height="126" rx="24" fill="url(#key)"/>
+    <rect x="378" y="356" width="136" height="126" rx="24" fill="url(#key)"/>
+    <rect x="546" y="356" width="136" height="126" rx="24" fill="url(#key)"/>
+    <!-- second row -->
+    <rect x="168" y="510" width="136" height="126" rx="24" fill="url(#key)"/>
+    <rect x="336" y="510" width="136" height="126" rx="24" fill="url(#key)"/>
+    <rect x="504" y="510" width="136" height="126" rx="24" fill="url(#key)"/>
+    <rect x="672" y="510" width="136" height="126" rx="24" fill="url(#key)"/>
+    <!-- space -->
+    <rect x="228" y="670" width="568" height="118" rx="25" fill="url(#key)"/>
+  </g>
+
+  <!-- subtle highlights on keys -->
+  <g fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2">
+    <path d="M230 373h95"/>
+    <path d="M398 373h95"/>
+    <path d="M566 373h95"/>
+    <path d="M188 527h95"/>
+    <path d="M356 527h95"/>
+    <path d="M524 527h95"/>
+    <path d="M692 527h95"/>
+    <path d="M251 687h522"/>
+  </g>
+
+  <!-- luminous cleaning sweep -->
+  <path d="M170 721
+           C 300 668, 429 612, 528 545
+           C 631 476, 698 406, 770 322
+           C 701 420, 645 488, 552 559
+           C 449 638, 317 696, 170 721 Z"
+        fill="url(#sweep)" opacity=".96" filter="url(#glow)"/>
+  <path d="M178 716 C 337 650, 497 579, 610 488 C 677 434, 724 381, 770 322"
+        fill="none" stroke="#f8fdff" stroke-width="7" stroke-linecap="round" opacity=".98"/>
+
+  <!-- sparkle cluster -->
+  <g fill="#fff" filter="url(#starGlow)">
+    <path d="M792 202 C800 243 812 255 853 264 C812 273 800 285 792 326 C784 285 772 273 731 264 C772 255 784 243 792 202Z"/>
+    <path d="M867 294 C872 319 879 326 904 332 C879 338 872 345 867 370 C862 345 855 338 830 332 C855 326 862 319 867 294Z"/>
+    <circle cx="736" cy="314" r="5"/>
+    <circle cx="760" cy="187" r="5"/>
+    <circle cx="895" cy="271" r="3.5"/>
+  </g>
+</g>
+</svg>
