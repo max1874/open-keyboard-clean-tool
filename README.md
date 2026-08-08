@@ -14,7 +14,7 @@
 OpenKeyboardCleanTool is a tiny, open-source macOS app made for one job: temporarily block every keyboard key while you clean, without disabling your mouse or trackpad.
 
 <p align="center">
-  <img src="docs/app-preview.png" width="460" alt="OpenKeyboardCleanTool window">
+  <img src="docs/app-preview.png" width="720" alt="OpenKeyboardCleanTool on macOS">
 </p>
 
 ## Why this app
