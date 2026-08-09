@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+project_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 app_dir="$project_dir/build/OpenKeyboardCleanTool.app"
 contents_dir="$app_dir/Contents"
 module_cache="$project_dir/.build/clang-module-cache"
@@ -20,7 +20,12 @@ fi
 cd "$project_dir"
 export CLANG_MODULE_CACHE_PATH="$module_cache"
 export SWIFTPM_MODULECACHE_OVERRIDE="$module_cache"
-swift build --disable-sandbox -c release --product OpenKeyboardCleanTool
+swift build --disable-sandbox -c release --product OpenKeyboardCleanTool -Xswiftc -gnone
+
+case "$app_dir" in
+    "$project_dir"/build/OpenKeyboardCleanTool.app) rm -rf "$app_dir" ;;
+    *) echo "Refusing to remove unexpected app directory: $app_dir" >&2; exit 1 ;;
+esac
 mkdir -p "$contents_dir/MacOS" "$contents_dir/Resources"
 cp ".build/release/OpenKeyboardCleanTool" "$contents_dir/MacOS/OpenKeyboardCleanTool"
 cp "Resources/Info.plist" "$contents_dir/Info.plist"

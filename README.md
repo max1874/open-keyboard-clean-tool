@@ -29,7 +29,24 @@ OpenKeyboardCleanTool is a tiny, open-source macOS app made for one job: tempora
 ## Requirements
 
 - macOS 13 or later
+- Apple silicon Mac
 - Accessibility permission, required by macOS to intercept keyboard events
+
+## Install a release build
+
+1. Download the DMG and matching `.sha256` file from the release.
+2. Verify the download in Terminal:
+
+   ```sh
+   shasum -a 256 -c OpenKeyboardCleanTool-0.1.0.dmg.sha256
+   ```
+
+3. Open the DMG and drag OpenKeyboardCleanTool to **Applications**.
+4. Try to open the app once. Because the privacy-preserving build is ad-hoc signed and not notarized, macOS will block the first launch.
+5. Open **System Settings → Privacy & Security**, scroll to **Security**, then click **Open Anyway** and confirm.
+6. In **System Settings → Privacy & Security → Accessibility**, enable OpenKeyboardCleanTool. Return to the app and click **Check Again**.
+
+The release workflow builds on a clean GitHub-hosted macOS runner, uses an ad-hoc signature, and rejects a candidate if the mounted image contains a signing certificate or printable email address or `/Users/...` build path. This avoids embedding the maintainer's personal Apple Development certificate, but it also means Gatekeeper cannot identify the developer. Review the source and checksum before overriding macOS security.
 
 ## Build from source
 
@@ -48,7 +65,7 @@ The build uses a local Apple Development certificate so Accessibility permission
 SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" make app
 ```
 
-For a one-off unsigned local build:
+For a one-off ad-hoc-signed local build:
 
 ```sh
 SIGN_IDENTITY=- make app
@@ -61,7 +78,10 @@ Ad-hoc signatures can change identity after rebuilding, so macOS may ask for Acc
 ```sh
 make test       # Run the Swift test suite
 make icon       # Regenerate the app icon asset catalog from Resources/AppIcon.png
+make dmg        # Build a local drag-to-Applications DMG
 ```
+
+Maintainers can run **Release candidate** manually in GitHub Actions to build and audit a seven-day downloadable candidate. The workflow does not create a GitHub Release or publish anything automatically.
 
 Keyboard filtering lives entirely inside the foreground process. Normal keys, modifiers, function keys, and media keys are blocked during cleaning; pointer and scroll events pass through. Quitting or a process crash removes the event tap automatically.
 

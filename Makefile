@@ -1,9 +1,12 @@
-.PHONY: app icon test
+.PHONY: app dmg icon test
 
 MODULE_CACHE := $(CURDIR)/.build/clang-module-cache
 
 app:
 	./scripts/build-app.sh
+
+dmg:
+	./scripts/build-dmg.sh
 
 icon:
 	./scripts/build-icon.sh
