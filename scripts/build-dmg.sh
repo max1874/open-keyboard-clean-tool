@@ -6,16 +6,18 @@ app_path="$project_dir/build/OpenKeyboardCleanTool.app"
 version=$(plutil -extract CFBundleShortVersionString raw "$project_dir/Resources/Info.plist")
 dmg_path="$project_dir/build/OpenKeyboardCleanTool-$version.dmg"
 mkdir -p "$project_dir/build"
-work_dir=$(mktemp -d "$project_dir/build/dmg-source.XXXXXX")
+work_dir=$(mktemp -d -t openkeyboard-dmg)
+work_dir=$(CDPATH='' cd -- "$work_dir" && pwd -P)
 source_dir="$work_dir/source"
 background_dir="$work_dir/background"
+staged_dmg_path="$work_dir/OpenKeyboardCleanTool-$version.dmg"
 
 cleanup() {
     status=$?
     trap - EXIT HUP INT TERM
 
-    case "$work_dir" in
-        "$project_dir"/build/dmg-source.*) rm -rf "$work_dir" || status=1 ;;
+    case "$(basename "$work_dir")" in
+        openkeyboard-dmg.*) rm -rf "$work_dir" || status=1 ;;
         *) echo "Refusing to remove unexpected work directory: $work_dir" >&2; status=1 ;;
     esac
 
@@ -54,13 +56,13 @@ create_image() {
         --format UDZO \
         --applescript-sleep-duration 8 \
         --overwrite \
-        "$dmg_path" \
+        "$staged_dmg_path" \
         "$source_dir"
 }
 
 clean_intermediate_images() {
-    find "$project_dir/build" -maxdepth 1 -type f \
-        -name "rw.*.$(basename "$dmg_path")" -delete
+    find "$work_dir" -maxdepth 1 -type f \
+        -name "rw.*.$(basename "$staged_dmg_path")" -delete
 }
 
 clean_intermediate_images
@@ -78,6 +80,7 @@ do
     sleep 2
 done
 
+mv -f "$staged_dmg_path" "$dmg_path"
 hdiutil verify "$dmg_path" >/dev/null
 echo "$dmg_path"
 shasum -a 256 "$dmg_path"

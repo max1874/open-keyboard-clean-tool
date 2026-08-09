@@ -102,7 +102,7 @@ case " $architectures " in
     *) echo "Release audit failed: Apple silicon architecture is missing." >&2; exit 1 ;;
 esac
 
-identity_pattern='/Users/[[:alnum:]_.-]+/|Apple (Development|Distribution):|[[:alnum:]_.%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}'
+identity_pattern='Users/[[:alnum:]_.-]+/|Apple (Development|Distribution):|[[:alnum:]_.%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}'
 identity_matches="$work_dir/identity-matches.txt"
 : > "$identity_matches"
 
