@@ -51,7 +51,7 @@ OpenKeyboardCleanTool is a lightweight, open-source KeyboardCleanTool alternativ
 2. Verify the download in Terminal:
 
    ```sh
-   shasum -a 256 -c OpenKeyboardCleanTool-0.1.0.dmg.sha256
+   shasum -a 256 -c OpenKeyboardCleanTool-*.dmg.sha256
    ```
 
 3. Open the DMG and drag OpenKeyboardCleanTool to **Applications**.
