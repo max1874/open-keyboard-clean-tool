@@ -1,4 +1,4 @@
-.PHONY: app dmg icon test
+.PHONY: app dmg notarize icon test
 
 MODULE_CACHE := $(CURDIR)/.build/clang-module-cache
 
@@ -7,6 +7,9 @@ app:
 
 dmg:
 	./scripts/build-dmg.sh
+
+notarize:
+	./scripts/notarize-release.sh
 
 icon:
 	./scripts/build-icon.sh
