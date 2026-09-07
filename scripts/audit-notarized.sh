@@ -8,7 +8,7 @@ fi
 
 dmg_path=$1
 expected_version=${2-}
-work_dir=$(mktemp -d -t openkeyboard-release-audit)
+work_dir=$(mktemp -d -t openkeyboard-notarized-audit)
 work_dir=$(CDPATH='' cd -- "$work_dir" && pwd -P)
 mount_dir="$work_dir/mount"
 mkdir "$mount_dir"
@@ -30,7 +30,7 @@ cleanup() {
         status=1
     else
         case "$(basename "$work_dir")" in
-            openkeyboard-release-audit.*) rm -rf "$work_dir" || status=1 ;;
+            openkeyboard-notarized-audit.*) rm -rf "$work_dir" || status=1 ;;
             *) echo "Refusing to remove unexpected audit directory: $work_dir" >&2; status=1 ;;
         esac
     fi
@@ -46,6 +46,18 @@ if [ ! -f "$dmg_path" ]; then
 fi
 
 hdiutil verify "$dmg_path" >/dev/null
+
+if ! xcrun stapler validate "$dmg_path" >/dev/null 2>&1; then
+    echo "Release audit failed: the disk image carries no stapled notarization ticket." >&2
+    exit 1
+fi
+
+if ! spctl --assess --type open --context context:primary-signature "$dmg_path" >/dev/null 2>&1; then
+    echo "Release audit failed: Gatekeeper rejects the disk image." >&2
+    spctl --assess --type open --context context:primary-signature --verbose=4 "$dmg_path" >&2 || true
+    exit 1
+fi
+
 hdiutil attach -nobrowse -readonly -mountpoint "$mount_dir" "$dmg_path" >/dev/null
 mounted=1
 
@@ -66,25 +78,35 @@ fi
 codesign --verify --deep --strict "$app_path"
 signature_details=$(codesign -d --verbose=4 "$app_path" 2>&1)
 
-if ! printf '%s\n' "$signature_details" | grep -Fxq "Signature=adhoc"; then
-    echo "Release audit failed: application is not ad-hoc signed." >&2
+if ! printf '%s\n' "$signature_details" | grep -q '^Authority=Developer ID Application: '; then
+    echo "Release audit failed: the application is not signed with a Developer ID Application certificate." >&2
     exit 1
 fi
 
-if ! printf '%s\n' "$signature_details" | grep -Fxq "TeamIdentifier=not set"; then
-    echo "Release audit failed: a signing team identifier is embedded." >&2
+if ! printf '%s\n' "$signature_details" | grep -q '^TeamIdentifier=[A-Z0-9]'; then
+    echo "Release audit failed: no team identifier is embedded." >&2
     exit 1
 fi
 
-if printf '%s\n' "$signature_details" | grep -q '^Authority='; then
-    echo "Release audit failed: a signing certificate authority is embedded." >&2
+if ! printf '%s\n' "$signature_details" | grep -q '^Timestamp='; then
+    echo "Release audit failed: the signature carries no secure timestamp." >&2
     exit 1
 fi
 
-certificate_prefix="$work_dir/extracted-certificate"
-codesign -d --extract-certificates="$certificate_prefix" "$app_path" >/dev/null 2>&1 || true
-if find "$work_dir" -maxdepth 1 -type f -name 'extracted-certificate*' | grep -q .; then
-    echo "Release audit failed: an identity certificate is embedded." >&2
+if ! printf '%s\n' "$signature_details" | grep -q 'flags=.*runtime'; then
+    echo "Release audit failed: the hardened runtime is not enabled." >&2
+    exit 1
+fi
+
+if ! xcrun stapler validate "$app_path" >/dev/null 2>&1; then
+    echo "Release audit failed: the application carries no stapled notarization ticket." >&2
+    exit 1
+fi
+
+assessment=$(spctl --assess --type exec --verbose=4 "$app_path" 2>&1 || true)
+if ! printf '%s\n' "$assessment" | grep -Fq "source=Notarized Developer ID"; then
+    echo "Release audit failed: Gatekeeper does not report the application as notarized." >&2
+    printf '%s\n' "$assessment" >&2
     exit 1
 fi
 
@@ -102,25 +124,4 @@ case " $architectures " in
     *) echo "Release audit failed: Apple silicon architecture is missing." >&2; exit 1 ;;
 esac
 
-identity_pattern='Users/[[:alnum:]_.-]+/|Apple (Development|Distribution):|[[:alnum:]_.%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}'
-identity_matches="$work_dir/identity-matches.txt"
-: > "$identity_matches"
-
-find "$mount_dir" -type f -print | while IFS= read -r file_path
-do
-    matches=$(strings -a "$file_path" \
-        | LC_ALL=C grep -E "$identity_pattern" \
-        | grep -Ev '^icon_[0-9]+x[0-9]+@2x\.png$' \
-        || true)
-    if [ -n "$matches" ]; then
-        printf '%s\n%s\n' "$file_path" "$matches" >> "$identity_matches"
-    fi
-done
-
-if [ -s "$identity_matches" ]; then
-    echo "Release audit failed: printable identity-bearing content was found." >&2
-    cat "$identity_matches" >&2
-    exit 1
-fi
-
-echo "Release audit passed: ad-hoc signature, no certificate identity, arm64 present, privacy scan clean."
+echo "Release audit passed: Developer ID signature, hardened runtime, secure timestamp, stapled ticket, Gatekeeper accepts, arm64 present."

@@ -36,16 +36,24 @@ xcrun actool "Resources/Assets.xcassets" \
     --app-icon AppIcon \
     --output-partial-info-plist "$project_dir/build/asset-info.plist" \
     >/dev/null
-if [ "$signing_identity" = "-" ]; then
+case "$signing_identity" in
+"-")
     codesign --force --sign - "$app_dir"
     echo "Warning: ad-hoc signing was explicitly requested; Accessibility permission may need to be granted again after rebuilding." >&2
-elif [ -n "$signing_identity" ]; then
+    ;;
+"Developer ID Application"*)
+    codesign --force --options runtime --timestamp --sign "$signing_identity" "$app_dir"
+    echo "Signed with: $signing_identity (hardened runtime, secure timestamp)"
+    ;;
+?*)
     codesign --force --sign "$signing_identity" "$app_dir"
     echo "Signed with: $signing_identity"
-else
+    ;;
+*)
     echo "Error: no Apple Development signing identity found." >&2
     echo "Set SIGN_IDENTITY to a certificate name, or explicitly use SIGN_IDENTITY=- for an ad-hoc one-off build." >&2
     exit 1
-fi
+    ;;
+esac
 
 echo "$app_dir"

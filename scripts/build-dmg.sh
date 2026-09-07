@@ -31,7 +31,11 @@ if ! command -v create-dmg >/dev/null 2>&1; then
     exit 1
 fi
 
-"$project_dir/scripts/build-app.sh"
+if [ "${SKIP_APP_BUILD-0}" = "1" ]; then
+    test -d "$app_path"
+else
+    "$project_dir/scripts/build-app.sh"
+fi
 mkdir -p "$source_dir" "$background_dir"
 cp -R "$app_path" "$source_dir/OpenKeyboardCleanTool.app"
 

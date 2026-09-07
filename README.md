@@ -55,11 +55,12 @@ OpenKeyboardCleanTool is a lightweight, open-source KeyboardCleanTool alternativ
    ```
 
 3. Open the DMG and drag OpenKeyboardCleanTool to **Applications**.
-4. Try to open the app once. Because the privacy-preserving build is ad-hoc signed and not notarized, macOS will block the first launch.
-5. Open **System Settings → Privacy & Security**, scroll to **Security**, then click **Open Anyway** and confirm.
-6. In **System Settings → Privacy & Security → Accessibility**, enable OpenKeyboardCleanTool. Return to the app and click **Check Again**.
+4. Open the app.
+5. In **System Settings → Privacy & Security → Accessibility**, enable OpenKeyboardCleanTool. Return to the app and click **Check Again**.
 
-The release workflow builds on a clean GitHub-hosted macOS runner, uses an ad-hoc signature, and rejects a candidate if the mounted image contains a signing certificate or printable email address or `/Users/...` build path. This avoids embedding the maintainer's personal Apple Development certificate, but it also means Gatekeeper cannot identify the developer. Review the source and checksum before overriding macOS security.
+Released disk images are signed with the maintainer's Developer ID certificate, built with the hardened runtime, notarized by Apple, and stapled, so Gatekeeper opens them without a security override. The signature carries the maintainer's certificate name and Apple Developer team identifier, which is what lets Apple vouch for the build.
+
+`make dmg` builds the same disk image from source without those credentials, and `scripts/audit-notarized.sh` re-checks a released image end to end: Developer ID signature, hardened runtime, secure timestamp, stapled ticket, and a Gatekeeper verdict of `source=Notarized Developer ID`.
 
 ## Build from source
 
@@ -92,9 +93,10 @@ Ad-hoc signatures can change identity after rebuilding, so macOS may ask for Acc
 make test       # Run the Swift test suite
 make icon       # Regenerate the app icon asset catalog from Resources/AppIcon.png
 make dmg        # Build a local drag-to-Applications DMG
+make notarize   # Build, sign, notarize, staple and audit a release DMG
 ```
 
-Maintainers can run **Release candidate** manually in GitHub Actions to build and audit a seven-day downloadable candidate. The workflow does not create a GitHub Release or publish anything automatically.
+`make notarize` is the maintainer release path. It needs a Developer ID Application certificate in the login keychain and App Store Connect API credentials, supplied through `ASC_P8_PATH`, `ASC_KEY_ID` and `ASC_ISSUER_ID`, or through a three-line credentials file named by `ASC_CREDENTIALS_FILE`. It notarizes the application bundle first and staples it, then repeats both steps for the disk image, so a copy dragged out of the image validates offline too. Releases are built and notarized locally rather than in CI, which keeps the signing key off GitHub.
 
 ## How does it block keyboard input?
 
