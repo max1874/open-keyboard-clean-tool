@@ -112,7 +112,10 @@ codesign --force --timestamp --sign "$signing_identity" "$dmg_path"
 submit "$dmg_path"
 xcrun stapler staple "$dmg_path"
 
-shasum -a 256 "$dmg_path" > "$dmg_path.sha256"
+# Recorded as a bare filename so `shasum -a 256 -c` works next to the download,
+# and so the maintainer's build path never ships as a release asset.
+dmg_name=$(basename "$dmg_path")
+(cd "$build_dir" && shasum -a 256 "$dmg_name" > "$dmg_name.sha256")
 
 echo "==> Auditing the notarized release"
 "$project_dir/scripts/audit-notarized.sh" "$dmg_path" "$version"
