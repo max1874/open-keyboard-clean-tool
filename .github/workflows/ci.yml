@@ -15,3 +15,17 @@ jobs:
       - uses: actions/checkout@v7
       - name: Test
         run: swift test
+
+      # `swift test` only compiles the SPM target. Assembling the bundle is
+      # where the icon catalog, the Info.plist copy and the signing branches
+      # are exercised, and the test suite reaches none of it.
+      - name: Build the application bundle
+        env:
+          SIGN_IDENTITY: '-'
+        run: make app
+
+      - name: Verify the bundle
+        run: |
+          codesign --verify --deep --strict build/OpenKeyboardCleanTool.app
+          test -f build/OpenKeyboardCleanTool.app/Contents/Resources/AppIcon.icns
+          lipo -archs build/OpenKeyboardCleanTool.app/Contents/MacOS/OpenKeyboardCleanTool
