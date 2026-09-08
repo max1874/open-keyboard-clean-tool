@@ -63,6 +63,14 @@ if [ ! -f "$key_path" ] || [ -z "$key_id" ] || [ -z "$issuer_id" ]; then
     exit 1
 fi
 
+# build-dmg.sh checks for this too, but it does not run until the application
+# has already been through notarization. Checking here costs nothing and saves
+# a round trip that would otherwise be spent before the tool turns up missing.
+if ! command -v create-dmg >/dev/null 2>&1; then
+    echo "Error: create-dmg is required. Install it with: brew install create-dmg" >&2
+    exit 1
+fi
+
 # notarytool exits non-zero when the submission is rejected, but the reason only
 # comes back from the log endpoint, so keep the id and fetch it before failing.
 submit() {
