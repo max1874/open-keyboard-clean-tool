@@ -60,7 +60,7 @@ OpenKeyboardCleanTool is a lightweight, open-source KeyboardCleanTool alternativ
 
 Released disk images are signed with the maintainer's Developer ID certificate, built with the hardened runtime, notarized by Apple, and stapled, so Gatekeeper opens them without a security override. The signature carries the maintainer's certificate name and Apple Developer team identifier, which is what lets Apple vouch for the build.
 
-`make dmg` builds the same disk image from source without those credentials, and `scripts/audit-notarized.sh` re-checks a released image end to end: Developer ID signature, hardened runtime, secure timestamp, stapled ticket, and a Gatekeeper verdict of `source=Notarized Developer ID`.
+Every released image is re-checked end to end before it is published: Developer ID signature, hardened runtime, secure timestamp, a stapled ticket on the image and another on the app inside it, and a Gatekeeper verdict of `source=Notarized Developer ID`.
 
 ## Build from source
 
@@ -92,11 +92,10 @@ Ad-hoc signatures can change identity after rebuilding, so macOS may ask for Acc
 ```sh
 make test       # Run the Swift test suite
 make icon       # Regenerate the app icon asset catalog from Resources/AppIcon.png
-make dmg        # Build a local drag-to-Applications DMG
-make notarize   # Build, sign, notarize, staple and audit a release DMG
+make release    # Signed, notarized, stapled DMG — maintainers only
 ```
 
-`make notarize` is the maintainer release path. It needs a Developer ID Application certificate in the login keychain and App Store Connect API credentials, supplied through `ASC_P8_PATH`, `ASC_KEY_ID` and `ASC_ISSUER_ID`, or through a three-line credentials file named by `ASC_CREDENTIALS_FILE`. It notarizes the application bundle first and staples it, then repeats both steps for the disk image, so a copy dragged out of the image validates offline too. Releases are built and notarized locally rather than in CI, which keeps the signing key off GitHub.
+`make release` runs on the maintainer's own machine rather than in CI, so the Developer ID certificate never leaves it. This repo only builds the app; the signing, notarization, stapling, and DMG steps are the `asc notarize` command from the maintainer's account-level tooling, which also holds the App Store Connect credentials. Nothing about the account lives in this repo. The app bundle is notarized and stapled first, then the disk image, so a copy dragged out of the image validates offline too.
 
 ## How does it block keyboard input?
 
