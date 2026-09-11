@@ -7,7 +7,6 @@
     <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-22c55e">
     <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-06b6d4">
-    <a href="https://github.com/max1874/open-keyboard-clean-tool/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/max1874/open-keyboard-clean-tool/actions/workflows/ci.yml/badge.svg"></a>
   </p>
   <p><a href="https://github.com/max1874/open-keyboard-clean-tool/releases/latest"><strong>Download the latest DMG</strong></a></p>
 </div>
