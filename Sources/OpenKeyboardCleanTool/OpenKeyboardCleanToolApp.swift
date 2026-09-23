@@ -31,13 +31,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.contentView = NSHostingView(rootView: rootView)
+        let hostingView = NSHostingView(rootView: rootView)
+        // The surface fills the window, so anything drawn outside its rounded
+        // shape (such as the shadow Liquid Glass adds while the window is key)
+        // would show up in the four corners. Clipping the root layer keeps the
+        // corners transparent and lets the window server shape the shadow to it.
+        hostingView.wantsLayer = true
+        hostingView.layer?.cornerRadius = windowCornerRadius
+        hostingView.layer?.cornerCurve = .continuous
+        hostingView.layer?.masksToBounds = true
+        window.contentView = hostingView
         window.isMovableByWindowBackground = true
         window.isOpaque = false
         window.backgroundColor = .clear
-        // The surface fills the window, so any outer shadow would be clipped to
-        // this rectangular backing store and become visible in the four corners.
-        window.hasShadow = false
+        window.hasShadow = true
         window.center()
         window.makeKeyAndOrderFront(nil)
         NSApplication.shared.activate(ignoringOtherApps: true)
