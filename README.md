@@ -5,13 +5,13 @@
   <p>
     <img alt="macOS 13+" src="https://img.shields.io/badge/macOS-13%2B-111827?logo=apple">
     <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
-    <img alt="PolyForm Noncommercial License" src="https://img.shields.io/badge/license-Noncommercial-f59e0b">
+    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-22c55e">
     <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-06b6d4">
   </p>
   <p><a href="https://github.com/max1874/open-keyboard-clean-tool/releases/latest"><strong>Download the latest DMG</strong></a></p>
 </div>
 
-OpenKeyboardCleanTool is a lightweight, source-available KeyboardCleanTool alternative for macOS. It temporarily locks and blocks keyboard input—including modifier, function, and media keys—so you can clean a MacBook keyboard without accidental keystrokes. Your mouse and trackpad remain active, and the app adds no menu bar item, background process, login item, telemetry, or third-party dependency.
+OpenKeyboardCleanTool is a lightweight, open-source KeyboardCleanTool alternative for macOS. It temporarily locks and blocks keyboard input—including modifier, function, and media keys—so you can clean a MacBook keyboard without accidental keystrokes. Your mouse and trackpad remain active, and the app adds no menu bar item, background process, login item, telemetry, or third-party dependency.
 
 <p align="center">
   <img src="docs/app-preview.png" width="720" alt="OpenKeyboardCleanTool macOS keyboard cleaner app">
@@ -23,7 +23,7 @@ OpenKeyboardCleanTool is a lightweight, source-available KeyboardCleanTool alter
 
 | Area | OpenKeyboardCleanTool behavior |
 | --- | --- |
-| Source | Public Swift and SwiftUI code under PolyForm Noncommercial 1.0.0 |
+| Source | Open-source Swift and SwiftUI code under the MIT License |
 | Keyboard coverage | Normal, modifier, function, brightness, volume, and media keys |
 | Pointer access | Mouse, trackpad, clicking, and scrolling remain available |
 | App lifecycle | Runs only when opened; optional lock on launch and quit after cleaning |
@@ -106,9 +106,4 @@ Accessibility access is powerful. This app uses it only to discard keyboard even
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE) © 2026 Max.
-
-Free to use, change, and share for any noncommercial purpose — personal work,
-research, teaching, charity. Commercial use needs a separate licence; open an
-issue. This is source-available rather than open source: an open-source licence
-cannot restrict the field of use, and this one does.
+[MIT](LICENSE) © 2026 MAX LIN
