@@ -14,6 +14,12 @@
 OpenKeyboardCleanTool is a lightweight, open-source KeyboardCleanTool alternative for macOS. It temporarily locks and blocks keyboard input—including modifier, function, and media keys—so you can clean a MacBook keyboard without accidental keystrokes. Your mouse and trackpad remain active, and the app adds no menu bar item, background process, login item, telemetry, or third-party dependency.
 
 <p align="center">
+  <a href="https://max1874.com/open-keyboard-clean-tool/"><img src="docs/demo.en.gif" width="800" alt="While cleaning is on, the keys do nothing and the trackpad keeps working"></a>
+  <br>
+  <sub>A recorded demo from <a href="https://max1874.com/open-keyboard-clean-tool/">max1874.com/open-keyboard-clean-tool</a>, where you can try it yourself.</sub>
+</p>
+
+<p align="center">
   <img src="docs/app-preview.png" width="720" alt="OpenKeyboardCleanTool macOS keyboard cleaner app">
 </p>
 
