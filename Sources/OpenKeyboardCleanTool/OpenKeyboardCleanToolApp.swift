@@ -4,14 +4,61 @@ import SwiftUI
 private let windowCornerRadius: CGFloat = 28
 private let windowSize = NSSize(width: 460, height: 440)
 
+// The app runs on a plain AppKit lifecycle. A SwiftUI `App` needs at least one
+// scene, and the empty `Settings` scene used for that opened a blank 900×450
+// Settings window behind the cleaning window at every launch on macOS 26.
 @main
-struct OpenKeyboardCleanToolApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-
-    var body: some Scene {
-        Settings {
-            EmptyView()
+enum OpenKeyboardCleanToolMain {
+    @MainActor
+    static func main() {
+        let application = NSApplication.shared
+        let delegate = AppDelegate()
+        application.delegate = delegate
+        application.mainMenu = makeMainMenu()
+        // NSApplication holds its delegate weakly.
+        withExtendedLifetime(delegate) {
+            application.run()
         }
+    }
+
+    @MainActor
+    private static func makeMainMenu() -> NSMenu {
+        let appName = ProcessInfo.processInfo.processName
+        let appMenu = NSMenu(title: appName)
+        appMenu.addItem(
+            withTitle: "About \(appName)",
+            action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
+            keyEquivalent: ""
+        )
+        appMenu.addItem(.separator())
+        appMenu.addItem(
+            withTitle: "Hide \(appName)",
+            action: #selector(NSApplication.hide(_:)),
+            keyEquivalent: "h"
+        )
+        let hideOthers = appMenu.addItem(
+            withTitle: "Hide Others",
+            action: #selector(NSApplication.hideOtherApplications(_:)),
+            keyEquivalent: "h"
+        )
+        hideOthers.keyEquivalentModifierMask = [.command, .option]
+        appMenu.addItem(
+            withTitle: "Show All",
+            action: #selector(NSApplication.unhideAllApplications(_:)),
+            keyEquivalent: ""
+        )
+        appMenu.addItem(.separator())
+        appMenu.addItem(
+            withTitle: "Quit \(appName)",
+            action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q"
+        )
+
+        let appMenuItem = NSMenuItem()
+        appMenuItem.submenu = appMenu
+        let mainMenu = NSMenu()
+        mainMenu.addItem(appMenuItem)
+        return mainMenu
     }
 }
 
